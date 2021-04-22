@@ -16,7 +16,8 @@ def greet(who_to_greet):
 r = requests.get("https://debashish.info")
 print(r.status_code)
 
-name = input("Your Name ?? ")
+# name = input("Your Name ?? ")
+name = "Sky"
 print(greet(name))
 
 
