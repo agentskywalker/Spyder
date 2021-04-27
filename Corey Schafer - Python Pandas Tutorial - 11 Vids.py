@@ -258,37 +258,90 @@ schema_df
 # Python Pandas Tutorial (Part 4): Filtering - Using Conditionals to Filter Rows and Columns
 ###############################################################################
 
+people = {
+    "first": ["Corey", "Jane", "John"],
+    "last": ["Schafer", "Doe", "Doe"],
+    "email": ["CoreyMSchafer@gmail.com", "JaneDoe@email.com", "JohnDoe@email.com"],
+}
+
+import pandas as pd
+
+df = pd.DataFrame(people)
+
+df
+
+df["last"] == "Doe"  # Returns True/false result <-- Filter mask
+
+
+#%% Type 1
+filt = (df["last"] == "Schafer") | (df["first"] == "John")
+df[filt]
+
+#%% Type 2
+df[(df["last"] == "Schafer") | (df["first"] == "John")]
+
+#%% Type 3 - Best way
+
+df.loc[filt, "email"]
+
+
+#%% Operators
+# & -> and
+# | -> or
+filt = (df["last"] == "Doe") & (df["first"] == "John")
+df.loc[filt, "email"]
+
+#%% All rows where fname is NOT Schafer, and lname is NOT John
+#   Achieved by ~ before filt
+filt = (df["last"] == "Schafer") | (df["first"] == "John")
+df.loc[~filt, "email"]
+
 #%%
 
+import pandas as pd
+
+# Default index is gone and the column Respondent is used as index
+df = pd.read_csv("data2019/survey_results_public.csv", index_col="Respondent")
+
+# Default index is gone and the column Column is used as index
+schema_df = pd.read_csv("data2019/survey_results_schema.csv", index_col="Column")
+pd.set_option("display.max_columns", 85)
+pd.set_option("display.max_rows", 85)
+
+df.head()
+
+#%%
+schema_df
 
 #%%
 
+high_salary = df["ConvertedComp"] > 50000
+df.loc[high_salary]  # see all columns for the filter
 
 #%%
+# see selected columns for the filter
+df.loc[high_salary, ["Country", "ConvertedComp", "JobSeek", "LanguageWorkedWith"]]
 
-#%%
+#%% See results from only specific country
 
-
-#%%
-
-
-#%%
-
-#%%
+countries = ["United States", "India", "United Kingdom", "Germany", "Canada"]
+filt = df["Country"].isin(countries)  # step 1. create a filter
+df.loc[filt, "Country"]  # step 2. apply the filter on the DF
 
 
-#%%
+#%% only get persons who said Python as a programming language skill
 
-
-#%%
-
-#%%
+df["LanguageWorkedWith"]  # E.g. C++;HTML/CSS;Java;JavaScript;Python;SQL;VBA
 
 
 #%%
+# search string for Python
+# Skip where the value is NaN/Not applicable
+filt = df["LanguageWorkedWith"].str.contains("Python", na=False)
+df.loc[filt, "LanguageWorkedWith"]
 
-
-#%%
+filt  # provide only True/False values
+df.loc[filt]
 
 #%%
 
