@@ -16,6 +16,9 @@ https://insights.stackoverflow.com/survey
 # - Installation and Loading Data
 # pip install pandas
 
+from os import replace
+from numpy import apply_along_axis
+from numpy.lib.shape_base import expand_dims
 import pandas as pd
 
 df = pd.read_csv("data2019/survey_results_public.csv")
@@ -343,6 +346,311 @@ df.loc[filt, "LanguageWorkedWith"]
 filt  # provide only True/False values
 df.loc[filt]
 
+#%% ################ Video 5 ##################################################
+# Python Pandas Tutorial (Part 5): Updating Rows and Columns - Modifying Data Within DataFrames
+###############################################################################
+people = {
+    "first": ["Corey", "Jane", "John"],
+    "last": ["Schafer", "Doe", "Doe"],
+    "email": ["CoreyMSchafer@gmail.com", "JaneDoe@email.com", "JohnDoe@email.com"],
+}
+
+import pandas as pd
+
+df = pd.DataFrame(people)
+
+df
+
+df.columns
+
+#%% Change names of all columns
+df.columns = ["first_name", "last_name", "email"]
+df.columns
+
+#%% Change column names to UC
+df.columns = [x.upper() for x in df.columns]
+df
+
+
+#%% Replace underscore with spaces in Column names
+df.columns = df.columns.str.replace("_", " ")
+df
+
+#%% Revert
+df.columns = df.columns.str.replace(" ", "_")
+df.columns = [x.lower() for x in df.columns]
+df
+
+#%% Rename Column names
+df.rename(columns={"first_name": "first", "last_name": "last"}, inplace=True)
+df
+
+#%% ROW OPERATIONS
+#   Update data for row 3
+
+df.loc[2] = ["John", "Smith", "JohnSmith@email.com"]
+df
+
+#%% Update selective data for row 3
+df.loc[2, ["last", "email"]] = ["Archer", "JohnArcher@email.com"]
+df
+
+#%% Update selective data for ONLY 1 COLUMN in row 3
+df.loc[2, "last"] = "Cipher"
+df
+
+#%% Revert
+df.at[2, "last"] = "Archer"
+df
+
+#%% Filtering a row using a column value
+
+filt = df["email"] == "JohnArcher@email.com"
+df[filt]
+
+# Filtering a column using a filtered row
+df[filt]["last"]
+
+#%% Trying to set on a Temp copy/view -- so error
+# SettingWithCopyWarning:
+# A value is trying to be set on a copy of a slice from a DataFrame.
+# Try using .loc[row_indexer,col_indexer] = value instead
+df[filt]["last"] = "Mohapatra"
+
+#%% Correct way to use filter to set column value
+df.loc[filt, "last"] = "Mohapatra"
+df
+
+#%% Retrieve and Format values without saving
+df["email"].str.lower()
+
+#%% Retrieve and Format values with saving. Update multiple rows at once
+df["email"] = df["email"].str.lower()
+df
+#%% 4 popular methods for Data Update
+# apply
+# map
+# applymap
+# replace
+########################################################
+#%% apply method with series objects
+# call a function on a series
+# check length of the email addresses
+df["email"].apply(len)
+
+
+#%% Update using a function and save
+def update_email(email):
+    return email.upper()
+
+
+df["email"] = df["email"].apply(update_email)  # pass the function only.
+# DO NOT give () after update-email function. () will execute the function
+df
+
+#%% Change email to lower case using lambda function
+df["email"] = df["email"].apply(lambda x: x.lower())
+df
+
+#%% apply method with data frames
+# check length of the email addresses
+df["email"].apply(len)
+
+# check number of rows in the df
+df.apply(len, axis="columns")
+
+len(df["email"])
+
+#%% Get the minimum value
+df.apply(pd.Series.min)
+
+#%% Get the minimum value
+df.apply(lambda x: x.min())
+
+#%% ######## applymap method ###############
+df.applymap(len)
+
+
+#%%
+df.applymap(str.lower)
+
+#%% ######## map method ###############
+# Change the values
+df["first"].map({"Corey": "Chris", "Jane": "Mary"})
+# ISSUE: The values which do not qualify, they will be changes to NaN (not a number)
+#%% ######## Replace method ###############
+# Change the values
+df["first"].replace({"Corey": "Chris", "Jane": "Mary"})
+
+# To Save:: df['first'] = df['first'].replace({'Corey': 'Chris', 'Jane': 'Mary'})
+
+#%% Functions on real world values
+import pandas as pd
+
+df = pd.read_csv("data2019/survey_results_public.csv")
+schema_df = pd.read_csv("data2019/survey_results_schema.csv")
+pd.set_option("display.max_columns", 85)
+pd.set_option("display.max_rows", 85)
+
+df.head()
+
+#%% Rename a column ConvertedComp to SalaryUSD
+df.rename(columns={"ConvertedComp": "SalaryUSD"}, inplace=True)
+
+#%% Check new column name and values
+df["SalaryUSD"]
+
+#%% This has Yes/No values
+df["Hobbyist"]
+
+#%% Convert Hobbyist to boolean values
+df["Hobbyist"].map({"Yes": True, "No": False})
+
+#%% Save
+df["Hobbyist"] = df["Hobbyist"].map({"Yes": True, "No": False})
+df
+#%% ################ Video 5 ##################################################
+# Python Pandas Tutorial (Part 6): Add/Remove Rows and Columns From DataFrames
+###############################################################################
+people = {
+    "first": ["Corey", "Jane", "John"],
+    "last": ["Schafer", "Doe", "Doe"],
+    "email": ["CoreyMSchafer@gmail.com", "JaneDoe@email.com", "JohnDoe@email.com"],
+}
+
+import pandas as pd
+
+df = pd.DataFrame(people)
+df
+
+#%% Combine Fname and Lname
+df["first"] + " " + df["last"]
+
+#%% Add new column Full name
+df["full_name"] = df["first"] + " " + df["last"]
+df
+
+# We can use apply function
+# Using a dot(.) on the df will add an attribute, and not a column. So use []
+
+#%% Remove columns using drop method
+df.drop(columns=["first", "last"])
+
+#%% Save
+df.drop(columns=["first", "last"], inplace=True)
+df
+#%% Split a value using a separator
+df["full_name"].str.split(" ")
+
+#%% Split up and shown in columns
+df["full_name"].str.split(" ", expand=True)
+
+#%% Add new columns
+df[["first", "last"]] = df["full_name"].str.split(" ", expand=True)
+df
+#%% Add rows to DF
+########### append method #################
+df.append({"first": "Tony"}, ignore_index=True)
+
+#%%
+people = {
+    "first": ["Tony", "Steve"],
+    "last": ["Stark", "Rogers"],
+    "email": ["IronMan@avenge.com", "Cap@avenge.com"],
+}
+df2 = pd.DataFrame(people)
+df2
+
+#%% Append df2 to df
+df.append(df2, ignore_index=True)
+
+#%% Save
+df = df.append(df2, ignore_index=True)
+
+#%% Combine 2 DFs by appending rows
+df
+
+#%% Remove Rows
+df.drop(index=4)
+# to save use inplace=True
+
+#%% Drop using condition
+# last name = Doe
+# df.drop(index=df[df['last'] == 'Doe'].index) # not so easy to read
+filt = df["last"] == "Doe"
+df.drop(index=df[filt].index)
+
+#%% ################ Video 5 ##################################################
+# Python Pandas Tutorial (Part 7): Sorting Data
+###############################################################################
+people = {
+    "first": ["Corey", "Jane", "John", "Adam"],
+    "last": ["Schafer", "Doe", "Doe", "Doe"],
+    "email": [
+        "CoreyMSchafer@gmail.com",
+        "JaneDoe@email.com",
+        "JohnDoe@email.com",
+        "A@email.com",
+    ],
+}
+
+import pandas as pd
+
+df = pd.DataFrame(people)
+df
+
+#%% Sort ASC by default
+df.sort_values(by="last")
+
+#%% Sort DESC
+df.sort_values(by="last", ascending=False)
+
+#%% Use multiple columns while sorting
+df.sort_values(by=["last", "first"], ascending=False)
+
+#%% Mixed ASC and DESC sorting
+# Last Name DESC, First Name ASC order
+df.sort_values(by=["last", "first"], ascending=[False, True], inplace=True)
+
+#%%
+df
+
+#%% Sort by index
+df.sort_index()
+
+#%% Sort only 1 column
+df["last"].sort_values()
+
+#%%
+import pandas as pd
+
+df = pd.read_csv("data2019/survey_results_public.csv")
+schema_df = pd.read_csv("data2019/survey_results_schema.csv")
+pd.set_option("display.max_columns", 85)
+pd.set_option("display.max_rows", 85)
+
+df.head()
+#%% Sort by country ASC, salary DESC. Save the result to df.
+df.sort_values(by=["Country", "ConvertedComp"], ascending=[True, False], inplace=True)
+
+#%%
+df.head()
+
+#%% Check first 50 rows
+df[["Country", "ConvertedComp"]].head(50)
+
+#%% Check 10 highest salaries in the survey
+df["ConvertedComp"].nlargest(10)
+
+#%% Check 10 smallest salaries in the survey
+df["ConvertedComp"].nsmallest(10)
+
+#%% Check 10 highest salaries in the survey and Get the entire rows
+df.nlargest(10, "ConvertedComp")
+
+#%% Check 10 smallest salaries in the survey and Get the entire rows
+df.nsmallest(10, "ConvertedComp")
+
 #%%
 
 
@@ -358,6 +666,245 @@ df.loc[filt]
 
 
 #%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
+
+#%%
+
+
+#%%
+
+#%%
+
 
 #%%
 
