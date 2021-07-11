@@ -580,7 +580,7 @@ df.drop(index=4)
 filt = df["last"] == "Doe"
 df.drop(index=df[filt].index)
 
-#%% ################ Video 5 ##################################################
+#%% ######################## ##################################################
 # Python Pandas Tutorial (Part 7): Sorting Data
 ###############################################################################
 people = {
@@ -651,16 +651,25 @@ df.nlargest(10, "ConvertedComp")
 #%% Check 10 smallest salaries in the survey and Get the entire rows
 df.nsmallest(10, "ConvertedComp")
 
+#%% ###########################################################################
+# Python Pandas Tutorial (Part 8): Grouping and Aggregating - Analyzing and Exploring Your Data
+###############################################################################
+#%%
+import pandas as pd
+
+df = pd.read_csv("data2019/survey_results_public.csv")
+schema_df = pd.read_csv("data2019/survey_results_schema.csv")
+pd.set_option("display.max_columns", 85)
+pd.set_option("display.max_rows", 85)
+
+df.head()
+
 #%%
 
+df.head()
 
 #%%
-
-
-#%%
-
-#%%
-
+df["ConvertedComp"].head(15)
 
 #%%
 
