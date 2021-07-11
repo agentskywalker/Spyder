@@ -668,102 +668,152 @@ df.head()
 
 df.head()
 
-#%%
+#%% The Salary Column is called ConvertedComp
 df["ConvertedComp"].head(15)
 
-#%%
+#%% Gives Median value ignoring NaN values
+df["ConvertedComp"].median()
 
+#%% Get median values of numeric columns
+df.median()
 
-#%%
+#%% More stats
+# Mean salary can have unrealistic values
+# So go for Median
+df.describe()
 
+#%% Describe on a specific column
+df["ConvertedComp"].describe()
 
-#%%
-
-#%%
-
-
-#%%
-
-
-#%%
-
-#%%
-
+#%% Number of valid answers (Not NaN)
+df["ConvertedComp"].count()
 
 #%%
+df["Hobbyist"]
 
-
-#%%
-
-
-#%%
-
-#%%
+#%% How many people answered 'Yes' or 'No'
+# Count individual values
+df["Hobbyist"].value_counts()
 
 
 #%%
+df["SocialMedia"]
 
+#%% Should give you the full question details. FAILS
+schema_df.loc["SocialMedia"]
+schema_df["SocialMedia"]  # this fails too
+
+#%% How many people use Reddit, youtube, whatsapp and so on..
+df["SocialMedia"].value_counts()
+
+#%% View in percentage
+df["SocialMedia"].value_counts(normalize=True)
+
+#%% Grouping ################
+# Some combination of Splitting, Apply Function and Combine results
+# Count of participants from each country
+df["Country"].value_counts()
+
+#%% See the DF object
+df.groupby(["Country"])
+
+country_grp = df.groupby(["Country"])  # Save the group object to a variable
+
+#%% See the DF ONLY from 'United States'
+country_grp.get_group("United States")
+
+#%% See the DF ONLY from 'India'
+country_grp.get_group("India")
+
+#%% Same as a filter, E.g. Create a filter
+# See most popular Social Media sites by Country
+
+filt = df["Country"] == "United States"
+df.loc[filt]["SocialMedia"].value_counts()
+
+#%% Groupby will give results for all countries
+# Returns a series with multiple indexes - 1.Country and 2.SocialMedia
+country_grp["SocialMedia"].value_counts().head(50)
+
+
+#%% Groupby will give results for a specific country
+country_grp["SocialMedia"].value_counts().loc["India"]
+
+#%% Median Salary for all countries - Index is Country
+
+country_grp["ConvertedComp"].median()
+
+
+#%% Median Salary for a specific countrie - Index is Country
+country_grp["ConvertedComp"].median().loc["Germany"]
+
+#%% Get Mean and Median - pass the list of aggregate functions
+country_grp["ConvertedComp"].agg(["median", "mean"])
+
+#%% Get Mean and Median salary for a specific country
+country_grp["ConvertedComp"].agg(["median", "mean"]).loc["Germany"]
+
+#%% For India, check how many respondants worked with Python
+
+filt = df["Country"] == "India"
+df.loc[filt]["LanguageWorkedWith"].str.contains("Python")
+
+#%% sum() counts all True as 1, and False as 0
+# sum() can be used on numeric as well as boolean data
+filt = df["Country"] == "India"
+df.loc[filt]["LanguageWorkedWith"].str.contains("Python").sum()
+
+# Check later - True vs False behaviour on the sum()
+
+
+#%% Check all count per country where people worked with Python
+
+country_grp["LanguageWorkedWith"].str.contains("Python").sum()
+# AttributeError: 'SeriesGroupBy' object has no attribute 'str'
 
 #%%
 
-#%%
+country_grp["LanguageWorkedWith"].apply(lambda x: x.str.contains("Python").sum())
+
+#%% What % of people from each country know Python?
+
+contry_respondents = df["Country"].value_counts()
+contry_respondents
 
 #%%
-
-
-#%%
-
-
-#%%
+country_uses_python = country_grp["LanguageWorkedWith"].apply(
+    lambda x: x.str.contains("Python").sum()
+)
+country_uses_python
 
 #%%
+python_df = pd.concat(
+    [contry_respondents, country_uses_python], axis="columns", sort=False
+)
+python_df
 
-
-#%%
-
-
-#%%
-
-#%%
-
-
-#%%
-
-
-#%%
-
+#%% Rename and Replace
+python_df.rename(
+    columns={"Country": "NumRespondents", "LanguageWorkedWith": "NumKnowsPython"},
+    inplace=True,
+)
+python_df
 
 #%%
+python_df["PctKnowsPython"] = (
+    python_df["NumKnowsPython"] / python_df["NumRespondents"]
+) * 100
+python_df
+
+#%% Sort by largest %
+python_df.sort_values(by="PctKnowsPython", ascending=False, inplace=True)
+python_df
 
 #%%
+python_df.head(50)
 
-
-#%%
-
-
-#%%
-
-#%%
-
-
-#%%
-
-
-#%%
-
-
-#%%
-
-#%%
-
-
-#%%
-
-
-#%%
-
-#%%
-
+#%% Inspect a specific country
+python_df.loc["Japan"]
 
 #%%
 
